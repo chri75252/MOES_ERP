@@ -1,0 +1,137 @@
+import Link from "next/link";
+import { createServerSupabaseClient } from "../ssr/client";
+
+function getStatusBadge(status: string) {
+  switch (status) {
+    case "active":
+      return "bg-emerald-100 text-emerald-700 border-emerald-200";
+    case "on_hold":
+      return "bg-amber-100 text-amber-700 border-amber-200";
+    case "completed":
+      return "bg-blue-100 text-blue-700 border-blue-200";
+    default:
+      return "bg-slate-100 text-slate-600 border-slate-200";
+  }
+}
+
+function getProgressColor(pct: number) {
+  if (pct >= 75) return "bg-emerald-500";
+  if (pct >= 50) return "bg-blue-500";
+  if (pct >= 25) return "bg-amber-500";
+  return "bg-slate-300";
+}
+
+export default async function ProjectsPage() {
+  const supabase = createServerSupabaseClient();
+  const { data: projects } = await supabase
+    .from("projects")
+    .select("id, code, name, status, progress_pct, pm:profiles(display_name)")
+    .order("created_at", { ascending: false });
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Projects</h1>
+          <p className="mt-1 text-sm text-slate-500">Manage and track all your projects</p>
+        </div>
+        <div className="flex gap-3">
+          <Link
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            href="/projects/new"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            New Project
+          </Link>
+          <Link
+            className="inline-flex items-center gap-2 rounded-lg bg-white border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+            href="/projects/export"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Export CSV
+          </Link>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <table className="w-full text-left text-sm">
+          <thead className="border-b border-slate-200 bg-slate-50">
+            <tr>
+              <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Code</th>
+              <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Name</th>
+              <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">PM</th>
+              <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+              <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Progress</th>
+              <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {(projects ?? []).map((project) => {
+              const pm = project.pm as { display_name: string } | null;
+              const progressPct = project.progress_pct ?? 0;
+              return (
+                <tr key={project.id} className="hover:bg-slate-50 transition-colors">
+                  <td className="px-5 py-4">
+                    <span className="font-mono text-sm font-semibold text-slate-900">{project.code}</span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="font-medium text-slate-700">{project.name}</span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-slate-600">{pm?.display_name ?? "—"}</span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${getStatusBadge(project.status)}`}>
+                      {project.status?.replace("_", " ")}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-2 w-24 rounded-full bg-slate-100 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${getProgressColor(progressPct)}`}
+                          style={{ width: `${progressPct}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-slate-600">{progressPct}%</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    <Link
+                      className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                      href={`/projects/${project.id}`}
+                    >
+                      Open
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+            {projects?.length === 0 && (
+              <tr>
+                <td className="px-5 py-12 text-center text-sm text-slate-500" colSpan={6}>
+                  <div className="flex flex-col items-center gap-2">
+                    <svg className="h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    <span>No projects yet</span>
+                    <Link href="/projects/new" className="text-blue-600 hover:text-blue-700 font-medium">Create your first project →</Link>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}

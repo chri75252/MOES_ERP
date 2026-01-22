@@ -1,0 +1,365 @@
+# MCE Command Center — Complete Setup Guide (Beginner-Friendly)
+
+**Last Updated:** 2026-01-21  
+**Version:** 2.0 (includes all bug fixes)
+
+---
+
+## Before You Start
+
+This guide assumes you have:
+- A computer with **Windows**, **Mac**, or **Linux**
+- **Node.js 18+** installed (download from [nodejs.org](https://nodejs.org))
+- A **code editor** (we recommend [VS Code](https://code.visualstudio.com))
+- A **web browser** (Chrome, Firefox, or Edge)
+
+---
+
+## PHASE 1: Local Development Setup
+
+### Step 1: Download the Project
+
+1. **Open a terminal/command prompt**
+   - Windows: Press `Win + R`, type `cmd`, press Enter
+   - Mac: Press `Cmd + Space`, type `Terminal`, press Enter
+   
+2. **Navigate to where you want the project**
+   ```bash
+   cd Desktop
+   ```
+
+3. **Clone the repository** (if you have Git)
+   ```bash
+   git clone <repo-url>
+   cd mce-command-center
+   ```
+   
+   **OR** if you have a ZIP file:
+   - Extract the ZIP to your Desktop
+   - Open terminal and run: `cd Desktop/mce-command-center`
+
+4. **Install dependencies** (this may take 2-3 minutes)
+   ```bash
+   npm install
+   ```
+   Wait until you see "added X packages" message.
+
+---
+
+### Step 2: Create Clerk Account (Authentication)
+
+Clerk handles user login/signup. Here's how to set it up:
+
+1. **Open your browser** → Go to [https://clerk.com](https://clerk.com)
+2. Click **Sign up** (or Log in if you have an account)
+3. Click **+ Create Application**
+4. Fill in the form:
+   - **Application name:** `MCE Command Center`
+   - **Authentication methods:** Check **Email** (you can add others later)
+5. Click **Create Application**
+6. You'll be taken to the **API Keys** page
+7. **COPY these 2 keys** (keep this browser tab open!):
+   
+   | Key Name | Example Format |
+   |----------|----------------|
+   | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_test_abc123...` |
+   | `CLERK_SECRET_KEY` | `sk_test_xyz789...` |
+
+**⚠️ Important:** Don't share your secret key with anyone!
+
+---
+
+### Step 3: Create Supabase Project (Database)
+
+Supabase is your database. Here's how to set it up:
+
+1. **Open a new browser tab** → Go to [https://supabase.com](https://supabase.com)
+2. Click **Start your project** → Sign up or Log in
+3. Click **+ New Project**
+4. Fill in the form:
+   - **Organization:** Select your organization (or create one)
+   - **Project name:** `mce-command-center`
+   - **Database Password:** Create a strong password
+     - **⚠️ SAVE THIS PASSWORD** somewhere safe - you can't retrieve it later!
+   - **Region:** Choose the closest to you (e.g., `ap-southeast-1` for Asia)
+5. Click **Create new project**
+6. **Wait 2-3 minutes** for setup to complete
+
+7. Once ready, click **Settings** (gear icon in left sidebar)
+8. Click **API** (under Project Settings)
+9. **COPY these 3 values** (keep this tab open!):
+
+   | Key Name | Where to Find | Example Format |
+   |----------|---------------|----------------|
+   | `Project URL` | Under "Project URL" | `https://abc123.supabase.co` |
+   | `anon public key` | Under "Project API keys" | `eyJhbGci...` |
+   | `service_role key` | Click **Reveal** first | `eyJhbGci...` |
+
+---
+
+### Step 4: Create Environment File
+
+The `.env.local` file stores your secret keys. Here's how to create it:
+
+1. **Open your code editor** (VS Code recommended)
+2. **Open the `mce-command-center` folder**
+3. **Create a new file** in the root folder (same level as `package.json`)
+4. **Name it exactly:** `.env.local`
+   - Note: The dot at the beginning is important!
+   - Windows may warn you about filenames starting with a dot - click OK
+
+5. **Copy and paste** this template into the file:
+
+```bash
+# ===========================================
+# CLERK AUTHENTICATION (from Step 2)
+# ===========================================
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_YOUR_KEY_HERE
+CLERK_SECRET_KEY=sk_test_YOUR_KEY_HERE
+
+# ===========================================
+# SUPABASE DATABASE (from Step 3)
+# ===========================================
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co
+NEXT_PUBLIC_SUPABASE_KEY=eyJhbGci_YOUR_ANON_KEY_HERE
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci_YOUR_SERVICE_ROLE_KEY_HERE
+
+# ===========================================
+# APP CONFIGURATION (keep these as-is for local development)
+# ===========================================
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+```
+
+6. **Replace** the placeholder values with YOUR actual keys from Steps 2 and 3
+7. **Save the file** (Ctrl+S or Cmd+S)
+
+---
+
+### Step 5: Set Up the Database (Run Migrations)
+
+Migrations create all the tables and security rules in your database.
+
+#### Step 5A: Open SQL Editor
+1. Go back to your **Supabase browser tab**
+2. Click **SQL Editor** (left sidebar, looks like `</>` icon)
+3. Click **+ New query** button (top right)
+
+#### Step 5B: Run First Migration (Schema)
+1. In your code editor, open:
+   ```
+   mce-command-center/supabase/migrations/001_day1_schema.sql
+   ```
+2. **Select ALL text** (Ctrl+A or Cmd+A)
+3. **Copy** (Ctrl+C or Cmd+C)
+4. Go back to **Supabase SQL Editor** (browser)
+5. **Paste** into the empty query box (Ctrl+V or Cmd+V)
+6. Click **Run** button (bottom right)
+7. Wait for **"Success. No rows returned"** message ✅
+
+#### Step 5C: Run Second Migration (Security Policies)
+1. Click **+ New query** again
+2. Open file: `mce-command-center/supabase/migrations/002_day1_rls.sql`
+3. **Select ALL** → **Copy** → **Paste** into SQL Editor
+4. Click **Run**
+5. Wait for **"Success. No rows returned"** message ✅
+
+#### Step 5D: Run Fourth Migration (Security Hotfix)
+1. Click **+ New query** again
+2. Open file: `mce-command-center/supabase/migrations/004_security_hotfix.sql`
+3. **Select ALL** → **Copy** → **Paste** into SQL Editor
+4. Click **Run**
+5. Wait for **"Success. No rows returned"** message ✅
+
+**⚠️ Note:** Do NOT run `003_storage_policies.sql` in SQL Editor - we'll configure storage manually in the next step.
+
+---
+
+### Step 6: Create Storage Bucket
+
+The storage bucket holds uploaded documents.
+
+#### Step 6A: Create the Bucket
+1. In Supabase, click **Storage** (left sidebar, folder icon)
+2. Click **+ New bucket** button
+3. Fill in:
+   - **Name:** `mce-documents` (type exactly this)
+   - **Public bucket:** Leave **unchecked** (OFF)
+4. Click **Create bucket**
+
+#### Step 6B: Create Storage Policies (Optional - Only If Using Client-Side Auth)
+
+**Note:** The current system uses service role for document uploads, so these policies are optional. If you want to enable client-side uploads later:
+
+1. Stay in **Storage** section
+2. Click **Policies** tab
+3. Find `mce-documents` bucket
+4. Click **New Policy** → **For full customization**
+5. Follow the detailed instructions in `003_storage_policies.sql`
+
+---
+
+### Step 7: Connect Clerk to Supabase (JWT Bridge)
+
+This step allows Clerk authentication to work with Supabase security policies.
+
+#### Step 7A: Create JWT Template in Clerk
+1. Go back to **Clerk Dashboard** (browser tab)
+2. Click **JWT Templates** (left sidebar, under Configure)
+3. Click **+ New template**
+4. Select **Supabase** from the list
+5. The template will be pre-filled with correct settings
+6. Click **Save**
+7. **COPY the JWKS Endpoint URL** (looks like `https://your-app.clerk.accounts.dev/.well-known/jwks.json`)
+
+#### Step 7B: Configure Supabase to Trust Clerk
+1. Go back to **Supabase Dashboard** (browser tab)
+2. Click **Authentication** (left sidebar, shield icon)
+3. Click **Sign In / Providers** tab
+4. Scroll down to **Third-Party Auth** section
+5. Toggle it **ON**
+6. Paste your **Clerk domain** (e.g., `https://comic-kit-56.clerk.accounts.dev`)
+7. Click **Save**
+
+---
+
+### Step 8: Test Locally
+
+1. **Open terminal** in the `mce-command-center` folder
+2. Run:
+   ```bash
+   npm run dev
+   ```
+3. Wait for "Ready" message
+4. **Open browser** → Go to `http://localhost:3000`
+5. Click **Sign in**
+6. Create an account with your email
+7. You should see the dashboard!
+
+---
+
+## PHASE 2: First-Time Setup After Login
+
+### Step 9: Make Yourself an Admin
+
+By default, new users have the `viewer` role. Here's how to upgrade yourself:
+
+1. Go to **Supabase Dashboard** → **Table Editor** (left sidebar, table icon)
+2. Click **profiles** table
+3. Find your row (look for your email)
+4. Click the **role** cell
+5. Change from `viewer` to `super_admin`
+6. Press **Enter** to save
+7. **Refresh your app** (F5 or Ctrl+R)
+8. You now have admin access! 🎉
+
+---
+
+## PHASE 3: Deployment to Production (Vercel)
+
+### Step 10: Push to GitHub
+
+```bash
+git add .
+git commit -m "Initial setup complete"
+git push origin main
+```
+
+### Step 11: Deploy to Vercel
+
+1. Go to [https://vercel.com](https://vercel.com)
+2. Sign up with your **GitHub account**
+3. Click **Add New...** → **Project**
+4. Find and select your `mce-command-center` repo
+5. Click **Import**
+6. Click **Deploy** (it will fail - this is expected!)
+
+### Step 12: Add Environment Variables
+
+1. In Vercel, click **Settings** tab
+2. Click **Environment Variables** (left sidebar)
+3. Add each variable from your `.env.local` file:
+   - Click **Add**
+   - Enter the **Key** (e.g., `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`)
+   - Paste the **Value**
+   - Check all environments: Production, Preview, Development
+   - Click **Save**
+4. **Important:** Change `NEXT_PUBLIC_APP_URL` to your Vercel URL (e.g., `https://mce-command-center.vercel.app`)
+
+### Step 13: Redeploy
+
+1. Click **Deployments** tab
+2. Find the failed deployment
+3. Click **...** → **Redeploy**
+4. Wait for success ✅
+5. Click **Visit** to test!
+
+### Step 14: Update Clerk for Production
+
+1. Go to **Clerk Dashboard**
+2. Click **Domains** (left sidebar)
+3. Click **+ Add domain**
+4. Enter your Vercel URL (without `https://`)
+5. Click **Add domain**
+
+---
+
+## Troubleshooting Common Issues
+
+### Issue: "Profile not found" error
+**Solution:** This was fixed in the codebase. If you still see it:
+1. Make sure you ran all migrations (Steps 5B, 5C, 5D)
+2. Try signing out and back in
+
+### Issue: "An error occurred during upload" when uploading documents
+**Solution:** Make sure you're entering a valid **UUID** in the Project ID field, not text.
+- ✅ Valid: `55eaa703-af3e-4c04-951a-1a6ae3cb4214`
+- ❌ Invalid: `FINAL SUCCESS 001` or `kj`
+
+To find a project's UUID:
+1. Go to the Projects page
+2. Click on a project to open it
+3. The UUID is in the URL (e.g., `/projects/55eaa703-af3e-4c04-951a-1a6ae3cb4214`)
+
+### Issue: Projects list is empty
+**Solution:** Refresh the page (F5). If still empty, check the Supabase table:
+1. Go to Supabase → Table Editor → projects
+2. If projects exist there but not in the app, run migration `004_security_hotfix.sql`
+
+### Issue: "Invalid input syntax for type uuid"
+**Solution:** You entered invalid text in a UUID field. UUIDs look like:
+`xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` (8-4-4-4-12 characters with dashes)
+
+---
+
+## File Paths Summary
+
+| Purpose | File Path |
+|---------|-----------|
+| **Environment variables** | `.env.local` |
+| **First migration (schema)** | `supabase/migrations/001_day1_schema.sql` |
+| **Second migration (RLS)** | `supabase/migrations/002_day1_rls.sql` |
+| **Third migration (storage, manual)** | `supabase/migrations/003_storage_policies.sql` |
+| **Fourth migration (hotfix)** | `supabase/migrations/004_security_hotfix.sql` |
+| **Server actions** | `app/ssr/*.ts` |
+| **Pages** | `app/*/page.tsx` |
+
+---
+
+## Next Steps
+
+1. ✅ Create your first project
+2. ✅ Upload your first document
+3. ✅ Create a tender
+4. ✅ Invite team members (change their roles in Supabase)
+
+---
+
+## Need Help?
+
+1. Check the `ISSUE_RESOLUTION_REPORT.md` for detailed bug fixes
+2. Check `SYSTEM_ARCHITECTURE_COMPLETE.md` for technical details
+3. Check `DATABASE_SECURITY_AUDIT_REPORT.md` for security information
