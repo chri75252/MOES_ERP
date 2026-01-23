@@ -1,6 +1,6 @@
 # MCE Command Center — Quick Start Guide
 
-**Last Updated:** 2026-01-21
+**Last Updated:** 2026-01-24
 
 ---
 
@@ -47,6 +47,40 @@ The dashboard shows:
 
 ---
 
+### ✏️ Edit a Project
+
+**From the Projects List:**
+1. Click **Projects** in the top menu
+2. Find the project you want to edit
+3. Click **Edit** in the Actions column
+
+**From Project Details:**
+1. Open the project (click **Open >**)
+2. Click the blue **Edit Project** button
+
+**On the Edit Page:**
+- Change any field: code, name, status, progress, dates
+- Click **Save Changes** when done
+- Or click **Cancel** to discard changes
+
+---
+
+### 🗑️ Delete a Project
+
+1. Go to the project's **Edit** page (see above)
+2. Click the red **Delete Project** button
+3. A confirmation popup will appear
+4. Click **Yes, Delete** to confirm
+
+⚠️ **Warning:** Deleting a project will also delete:
+- All documents attached to the project
+- All milestones
+- All team member assignments
+
+This action **cannot be undone**.
+
+---
+
 ### 📋 Create a New Tender
 
 1. Click **Tenders** in the top menu
@@ -63,6 +97,13 @@ The dashboard shows:
 
 ### 📄 Upload a Document
 
+**Easiest Method (Recommended):**
+1. Open the project you want to upload to
+2. Click the **Upload Document** button
+3. The Project ID is **automatically filled in**!
+4. Select your file and click **Upload Document**
+
+**Alternative Method:**
 1. Click **Documents** in the top menu
 2. In the upload form:
    - **Project ID** — Copy the project's UUID (see below)
@@ -71,10 +112,9 @@ The dashboard shows:
 3. Click **Upload Document**
 
 **How to find a UUID:**
-1. Go to Projects or Tenders page
-2. Click on the item to view it
-3. Look at the URL: `/projects/55eaa703-af3e-4c04-951a-1a6ae3cb4214`
-4. The long string after `/projects/` is the UUID
+- The UUID is now shown on the project detail page under the project name
+- You can also find it in the URL: `/projects/55eaa703-af3e-4c04-951a-1a6ae3cb4214`
+- Triple-click the UUID to select it for copying
 
 **⚠️ Important:** Enter the full UUID, not project codes like "PROJ-001"
 

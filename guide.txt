@@ -1,7 +1,7 @@
 # MCE Command Center — Complete Setup Guide (Beginner-Friendly)
 
-**Last Updated:** 2026-01-21  
-**Version:** 2.0 (includes all bug fixes)
+**Last Updated:** 2026-01-24  
+**Version:** 2.1 (includes project edit/delete functionality)
 
 ---
 

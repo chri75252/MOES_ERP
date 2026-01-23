@@ -116,8 +116,11 @@ mce-command-center/
 
 ### Projects
 - Create and manage projects
+- **Edit project details** (name, status, progress, dates)
+- **Delete projects** with confirmation
 - Track progress with milestones
 - Assign team members
+- View project UUID for document uploads
 - Export data to CSV
 
 ### Tenders
@@ -245,5 +248,6 @@ For issues or questions:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 2.1 | 2026-01-24 | Added project edit/delete, UUID display, auto-fill document uploads |
 | 2.0 | 2026-01-21 | Bug fixes, documentation updates |
 | 1.0 | 2026-01-20 | Initial release |
