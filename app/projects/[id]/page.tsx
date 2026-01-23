@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createServerSupabaseClient } from "../../ssr/client";
+import { createServiceSupabaseClient } from "../../ssr/client";
+
+export const dynamic = 'force-dynamic';
 
 export default async function ProjectDetailPage({
   params,
@@ -8,16 +10,22 @@ export default async function ProjectDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = createServerSupabaseClient();
-  const { data: project } = await supabase
+  const supabase = createServiceSupabaseClient();
+
+  console.log('[ProjectDetailPage] Loading project:', id);
+
+  const { data: project, error } = await supabase
     .from("projects")
     .select(
-      "id, code, name, status, progress_pct, start_date, end_date, dlp_date, tags, pm:profiles(display_name), client:clients(name)"
+      "id, code, name, status, progress_pct, start_date, end_date, dlp_date, tags, pm:profiles!pm_profile_id(display_name), client:clients(name)"
     )
     .eq("id", id)
     .single();
 
+  console.log('[ProjectDetailPage] project:', project, 'error:', error);
+
   if (!project) {
+    console.log('[ProjectDetailPage] Project not found, calling notFound()');
     notFound();
   }
 
@@ -48,9 +56,21 @@ export default async function ProjectDetailPage({
           <div className="text-xs uppercase text-slate-500">Project Code</div>
           <h1 className="text-2xl font-semibold">{project.code}</h1>
           <p className="text-sm text-slate-600">{project.name}</p>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="text-xs text-slate-400">UUID:</span>
+            <code className="rounded bg-slate-100 px-2 py-0.5 text-xs font-mono text-slate-600 select-all">
+              {project.id}
+            </code>
+          </div>
         </div>
         <div className="flex gap-2">
-          <Link className="rounded border px-3 py-1.5 text-sm" href="/documents">
+          <Link
+            className="rounded border border-blue-600 bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
+            href={`/projects/${project.id}/edit`}
+          >
+            Edit Project
+          </Link>
+          <Link className="rounded border px-3 py-1.5 text-sm" href={`/documents?project=${project.id}`}>
             Upload Document
           </Link>
           <Link className="rounded border px-3 py-1.5 text-sm" href="/projects">

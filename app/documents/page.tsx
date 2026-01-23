@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { prepareDocumentUpload, createSignedDownload } from "../ssr/documents";
 
 export default function DocumentsPage() {
+  const searchParams = useSearchParams();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [projectId, setProjectId] = useState("");
   const [tenderId, setTenderId] = useState("");
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  // Auto-fill project ID from URL if provided
+  useEffect(() => {
+    const projectFromUrl = searchParams.get("project");
+    if (projectFromUrl) {
+      setProjectId(projectFromUrl);
+    }
+  }, [searchParams]);
 
   async function handleUpload() {
     if (!selectedFile) return;

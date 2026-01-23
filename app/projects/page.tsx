@@ -108,15 +108,23 @@ export default async function ProjectsPage() {
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <Link
-                      className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                      href={`/projects/${project.id}`}
-                    >
-                      Open
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                        href={`/projects/${project.id}`}
+                      >
+                        Open
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                      <Link
+                        className="text-sm text-slate-500 hover:text-slate-700 transition-colors"
+                        href={`/projects/${project.id}/edit`}
+                      >
+                        Edit
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               );

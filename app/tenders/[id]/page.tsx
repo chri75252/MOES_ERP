@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createServerSupabaseClient } from "../../ssr/client";
+import { createServiceSupabaseClient } from "../../ssr/client";
+
+export const dynamic = 'force-dynamic';
 
 function daysUntil(date: Date) {
   const diff = date.getTime() - new Date().getTime();
@@ -13,7 +15,7 @@ export default async function TenderDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = createServerSupabaseClient();
+  const supabase = createServiceSupabaseClient();
   const { data: tender } = await supabase
     .from("tenders")
     .select(
