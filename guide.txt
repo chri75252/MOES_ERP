@@ -349,6 +349,60 @@ To find a project's UUID:
 
 ---
 
+## Dependency Management (Important!)
+
+### Why We Use Specific Versions
+
+This project specifies exact package versions (e.g., `"tailwindcss": "^4.1.0"`) instead of `"latest"` to prevent breaking changes. Here's why:
+
+**Example:** Tailwind CSS v3 → v4 required code changes:
+- Old: `@tailwind base; @tailwind components; @tailwind utilities;`
+- New: `@import "tailwindcss";`
+- Old postcss config: `tailwindcss: {}`
+- New postcss config: `@tailwindcss/postcss: {}`
+
+Without pinned versions, your code could break when you run `npm install` on a new machine!
+
+### Keeping Dependencies Updated (Monthly)
+
+**Check what can be updated:**
+```bash
+npm outdated
+```
+
+**Update to latest safe versions:**
+```bash
+npm update
+```
+
+**After updating, test everything:**
+```bash
+npm run build
+npm run dev
+```
+
+### Major Version Updates (Quarterly)
+
+When upgrading from v3 → v4 or similar:
+
+1. **Check migration guide** (e.g., https://tailwindcss.com/docs/v4/migration-guide)
+2. **Update package.json** with new version
+3. **Install dependencies:** `npm install`
+4. **Update configuration files** per migration guide
+5. **Test thoroughly:** `npm run build && npm run dev`
+6. **Run test suite** if you have tests
+
+### Package Version Symbols Explained
+
+| Symbol | Meaning | Example |
+|--------|---------|---------|
+| `^4.1.0` | Minor/patch updates OK | `4.1.1`, `4.2.0` ✅ **Most Common** |
+| `~4.1.0` | Patch updates only | `4.1.1` only |
+| `4.1.0` | Exact version only | `4.1.0` exactly (strict) |
+| `latest` | Always newest | ❌ **Can break your code** |
+
+---
+
 ## Next Steps
 
 1. ✅ Create your first project

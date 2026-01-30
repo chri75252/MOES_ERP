@@ -21,6 +21,7 @@ MCE Command Center is a web application for managing construction projects and t
 | Document | Description |
 |----------|-------------|
 | [guide.txt](./guide.txt) | **Start here!** Full setup guide step-by-step |
+| [DEPENDENCY_MANAGEMENT.md](./DEPENDENCY_MANAGEMENT.md) | How to manage npm packages and updates |
 | [QUICK_START_GUIDE.md](./QUICK_START_GUIDE.md) | How to use the app (common tasks) |
 | [SYSTEM_ARCHITECTURE_COMPLETE.md](./SYSTEM_ARCHITECTURE_COMPLETE.md) | Technical overview |
 | [DATABASE_SCHEMA_REFERENCE.md](./DATABASE_SCHEMA_REFERENCE.md) | Database tables explained |
@@ -187,6 +188,49 @@ For storage bucket:
 | Empty dashboard | Refresh page (F5) |
 
 **For detailed troubleshooting, see [ISSUE_RESOLUTION_REPORT.md](./ISSUE_RESOLUTION_REPORT.md)**
+
+---
+
+## Dependency Management
+
+### Why Versions Matter
+
+This project uses **specific package versions** (not `"latest"`) to prevent breaking changes. Tailwind CSS v4 introduced breaking changes that required code updates.
+
+### Keeping Dependencies Updated
+
+**Check for updates:**
+```bash
+npm outdated
+```
+
+**Update to latest compatible versions:**
+```bash
+npm update
+```
+
+**Update specific package:**
+```bash
+npm install package-name@latest
+```
+
+**Remove unused packages:**
+```bash
+npm prune
+```
+
+### Version Symbols Explained
+- `^4.1.0` — Allows minor/patch updates (4.1.1, 4.2.0) but NOT major (5.0.0) ✅ **Recommended**
+- `~4.1.0` — Allows only patch updates (4.1.1) but NOT minor (4.2.0)
+- `4.1.0` — Exact version only (most strict for production)
+
+### Major Version Updates
+
+When a major version is available (e.g., v3 → v4):
+1. Check the library's migration guide
+2. Test thoroughly before upgrading
+3. Update configuration files if needed
+4. Run full test suite after upgrade
 
 ---
 
